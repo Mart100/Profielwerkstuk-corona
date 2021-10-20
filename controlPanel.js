@@ -69,38 +69,37 @@ function sliderListener() {
 
 function createDatarecord() {
   let total = 0
-  let dead = 0
-  let alife = 0
-  let healthy = 0
-  let immune = 0
+  let susceptible = 0
+  let removed = 0
   let infected = 0
-  let totalreproduction = 0
-  let totalreproductioncount = 0
+  let totalreproductionnumber = 0
+  let averagereproductionnumbertotal = 0
   
-  for(let p of humans) {
+  for(let human of humans) {
     total++
-    if(p.health < 0) dead++
-    if(p.health > 0) alife++
-    if(p.health == 100) healthy++
-    if(p.immunity > 0) immune++
-    if(p.health < 100 && p.health > 0) infected++
-
+    if(human.SIRstatus == "s") susceptible++
+    if(human.SIRstatus == "i") infected++
+    if(human.SIRstatus == "r") removed++
     
-    if(p.noLongerInfectedDate != 0 && tickCount-p.noLongerInfectedDate < 100) {
-      totalreproductioncount++
-      totalreproduction += p.othersInfected
+    if(human.SIRstatus == "i") {
+      let infectedLength = (tickCount-human.infectedDate)
+      if(human.othersInfected == 0) continue
+      totalreproductionnumber += human.othersInfected * (daysToTicks(virus.contagiousLength)/infectedLength)
+    }
+
+    if(human.SIRstatus == "r") {
+      averagereproductionnumbertotal += human.othersInfected
     }
   }
 
   let datarecord = {
     time: tickCount,
     total,
-    dead,
-    alife,
-    immune,
+    susceptible,
     infected,
-    healthy,
-    reproduction: totalreproduction/totalreproductioncount
+    removed,
+    reproduction: totalreproductionnumber/(humans.filter(h => h.SIRstatus=="i").length),
+    averageReproduction: averagereproductionnumbertotal/removed
   }
 
   datarecords.push(datarecord)
@@ -109,13 +108,14 @@ function createDatarecord() {
 let TPS = 0
 function updateInfoTab() {
   let lastDataRecord = datarecords[datarecords.length-1]
+
   $('#info > .content > .total > .value').html(lastDataRecord.total)
-  $('#info > .content > .dead > .value').html(lastDataRecord.dead)
-  $('#info > .content > .alife > .value').html(lastDataRecord.alife)
-  $('#info > .content > .healthy > .value').html(lastDataRecord.healthy)
-  $('#info > .content > .immune > .value').html(lastDataRecord.immune)
+  $('#info > .content > .susceptible > .value').html(lastDataRecord.susceptible)  
   $('#info > .content > .infected > .value').html(lastDataRecord.infected)
-  $('#info > .content > .reproduction > .value').html(Math.round(lastDataRecord.reproduction*1000)/1000)
+  $('#info > .content > .removed > .value').html(lastDataRecord.removed)
+  $('#info > .content > .reproduction > .value').html(Math.round(lastDataRecord.reproduction*100)/100)
+  $('#info > .content > .averageReproduction > .value').html(Math.round(lastDataRecord.averageReproduction*100)/100)
+
   $('#info > .content > .tickcount > .value').html(tickCount)
   let newtps = tickArray.filter(a => a+1000>Date.now()).length
   TPS = Math.round(((newtps+TPS)/2)*100)/100

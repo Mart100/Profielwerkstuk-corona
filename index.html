@@ -5,6 +5,8 @@
       <link rel="stylesheet" type="text/css" href="style.css">
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+      <script src="utils.js"></script>
+      <script src="virus.js"></script>
       <script src="index.js"></script>
       <script src="controlPanel.js"></script>
       <script src="noise.js"></script>
@@ -24,11 +26,13 @@
             <div class="data total">Total: <span class="value">0</span></div>
             <div class="data alife">Alife: <span class="value">0</span></div>
             <div class="data dead">Deaths: <span class="value">0</span></div>
-            <div class="data healthy">Healthy: <span class="value">0</span></div>
+            <div class="data susceptible">Suspceptible: <span class="value">0</span></div>
             <div class="data infected">Infected: <span class="value">0</span></div>
-            <div class="data immune">Immune: <span class="value">0</span></div>
+            <div class="data removed">Removed: <span class="value">0</span></div>
             <div class="data tickcount">Tick count: <span class="value">0</span></div>
-            <div class="data reproduction">Reproduction number: <span class="value">0</span></div>
+            <div class="data reproduction">R number: <span class="value">0</span></div>
+            <div class="data averageReproduction">avg R number: <span class="value">0</span></div>
+
             <div class="data tps">TPS: <span class="value">0</span></div>
             <div class="data day">Day: <span class="value">0</span></div>
           </div>

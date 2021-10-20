@@ -9,19 +9,45 @@ function createInfectionsGraph() {
   infectionsChart = new Chart(ctx, {
     type: 'line',
     data: {
-      datasets: [{
-        label: 'Infected',
+      datasets: [      {
+        label: 'removed',
+        data: [],
+        backgroundColor: 'black'
+      },
+      {
+        label: 'infected',
         data: [],
         backgroundColor: 'red'
       },
       {
-        label: 'Deaths',
+        label: 'susceptible',
         data: [],
-        backgroundColor: 'black'
+        backgroundColor: 'green'
       }],
       labels: []
     },
-    options: {}
+    options: {
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Day'
+          }
+        },
+        y: {
+          stacked: true,
+          title: {
+            display: true,
+            text: 'Count'
+          }
+        }
+      },
+      elements: {
+        point:{
+          radius: 0
+        }
+      }
+    }
   })
 }
 
@@ -34,10 +60,22 @@ function createReprodutionGraph() {
         label: 'R-number',
         data: [],
         backgroundColor: 'green'
+      },
+      {
+        label: 'avg R-number',
+        data: [],
+        fill: false,
+        borderColor: "blue",
       }],
       labels: []
     },
-    options: {}
+    options: {
+      elements: {
+        point:{
+          radius: 0
+        }
+      }
+    }
   })
 }
 
@@ -45,12 +83,13 @@ let reproductionChart
 function updateReproductionGraph() {
   if(reproductionChart == undefined) createReprodutionGraph()
   for(let datarecord of datarecords) {
-    let day = Math.floor(datarecord.time-firstInfection)/20
+    let day = Math.floor((datarecord.time-firstInfection)/20)
     if(lastDatarecordUpdated > datarecord.time) continue
     if(firstInfection == 0) continue
     if(day < 0) continue
     if(reproductionChart.data.labels[reproductionChart.data.labels.length-1] == day) continue
     reproductionChart.data.datasets[0].data.push({x:day, y: datarecord.reproduction})
+    reproductionChart.data.datasets[1].data.push({x:day, y: datarecord.averageReproduction})
     reproductionChart.data.labels.push(day)
     lastDatarecordUpdated = datarecord.time
   }
@@ -66,13 +105,14 @@ function updateInfectionsGraph() {
   let dataInfected = []
   let dataDeaths = []
   for(let datarecord of datarecords) {
-    let day = Math.floor(datarecord.time-firstInfection)/20
+    let day = Math.floor((datarecord.time-firstInfection)/20)
     if(lastDatarecordUpdated > datarecord.time) continue
     if(firstInfection == 0) continue
     if(day < 0) continue
     if(infectionsChart.data.labels[infectionsChart.data.labels.length-1] == day) continue
-    infectionsChart.data.datasets[0].data.push({x:day, y: datarecord.infected})
-    infectionsChart.data.datasets[1].data.push({x:day, y: datarecord.dead})
+    infectionsChart.data.datasets[2].data.push({x:day, y: datarecord.susceptible+datarecord.infected+datarecord.removed})
+    infectionsChart.data.datasets[1].data.push({x:day, y: datarecord.infected+datarecord.removed})
+    infectionsChart.data.datasets[0].data.push({x:day, y: datarecord.removed})
     infectionsChart.data.labels.push(day)
     lastDatarecordUpdated = datarecord.time
   }

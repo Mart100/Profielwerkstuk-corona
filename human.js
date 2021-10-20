@@ -4,15 +4,17 @@ class Human {
     this.pos = new Vector(x, y)
     this.anchor = new Vector(x, y)
 
-    this.health = 100
     this.radius = 5
     this.immunity = 0
+    this.SIRstatus = "s"
     this.nearbyHumans = []
     this.nearbyHumansBig = []
     this.target = null
     this.targetVel = null
     this.othersInfected = 0
+    this.infectedDate = 0
     this.noLongerInfectedDate = 0
+    this.vaccininProtection = 0
   }
   move() {
     if(this.target == null) {
@@ -23,7 +25,6 @@ class Human {
       } 
       // flight
       else {
-        if(this.health == 100) return
         let pos = new Vector(Math.random()*options.size, Math.random()*options.size)
         this.pos = pos.clone()
         this.anchor = pos.clone()
@@ -40,8 +41,9 @@ class Human {
     this.pos.y += this.targetVel.y
   }
   infect() {
-    if(this.health == 100) this.getNearbyHumansBig()
-    this.health -= 1
+    this.SIRstatus = "i"
+    this.infectedDate = tickCount
+    this.getNearbyHumansBig()
     
   }
   findTarget() {
@@ -58,7 +60,7 @@ class Human {
   }
   getNearbyHumans() {
     let radius = 2
-    let a = options.infectDistance*radius
+    let a = virus.infectionDistance*radius
     this.nearbyHumans = []
     for(let p of this.nearbyHumansBig) {
       if(Math.abs(this.pos.x-p.pos.x) > a) continue
@@ -70,7 +72,7 @@ class Human {
   }
   getNearbyHumansBig() {
     let radius = 50
-    let a = options.infectDistance*radius
+    let a = virus.infectionDistance*radius
     this.nearbyHumansBig = []
     for(let p of humans) {
       if(Math.abs(this.pos.x-p.pos.x) > a) continue
@@ -100,10 +102,9 @@ class Human {
     }
 
     let color = [0, 0, 0]
-    if(this.health == 100) color = [0, 255, 0]
-    if(this.health < 100) color = [0, 0, 255]
-    if(this.health < 50) color = [255, 0, 0]
-    if(this.health < 0) color = [0, 0, 0]
+    if(this.SIRstatus == "s") color = [0, 255, 0]
+    if(this.SIRstatus == "i") color = [0, 0, 255]
+    if(this.SIRstatus == "r") color = [0, 0, 0]
 
     ctx.beginPath()
     ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`
@@ -111,9 +112,5 @@ class Human {
     if(camera.zoom < 0.5) size = this.radius*0.5
     ctx.arc(pos.x, pos.y, size, 0, 2*Math.PI)
     ctx.fill()
-    if(this.immunity != 0 && this.health == 100) {
-      ctx.strokeStyle = 'blue'
-      ctx.stroke()
-    }
   }
 }

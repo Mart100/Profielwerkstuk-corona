@@ -9,11 +9,8 @@ let camera = {
 let day = 0
 let firstInfection = 0
 let options = {
-  infectDistance: 50,
   amount: 10000,
   checkOverlap: false,
-  infectChance: 10,
-  surviveChance: 98,
   size: 2500,
   density: 50,
   noisePopulation: true,
@@ -22,8 +19,10 @@ let options = {
   moveSpeed: 4,
   lockdown: false,
   paused: false,
-  drawing: true
+  drawing: true,
+  dayLength: 20
 }
+let virus = new Virus()
 let seed = Math.random()
 
 
