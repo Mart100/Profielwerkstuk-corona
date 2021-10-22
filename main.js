@@ -37,5 +37,5 @@ app.post('/log', (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log(`Profielwerkstuk automated logging at http://localhost:${port}`)
+  console.log(`Profielwerkstuk automated logging on ${port}`)
 })
