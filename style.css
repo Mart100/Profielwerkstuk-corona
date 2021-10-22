@@ -15,12 +15,20 @@ body {
   background-color: white;
   height: 100%;
   position: absolute;
+}
+
+#controlPanel #wrapper {
   overflow-y: auto;
+  height: calc(100% - 20px);
 }
 
 #controlPanel > div {
   width: 100%;
-  
+}
+
+#controlPanel > #footer {
+  position: sticky;
+  bottom: 0px;
 }
 
 #controlPanel > div .title {

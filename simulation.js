@@ -100,7 +100,7 @@ class Simulation {
 					if(typeof response === 'string') response = JSON.parse(response)
 					console.log('log response:', response)
 					searchParams.set("ve", response.ve)
-					window.location.href = "http://localhost:3000?"+searchParams.toString()
+					window.location.href = "?"+searchParams.toString()
 				}
 			})
 		}
