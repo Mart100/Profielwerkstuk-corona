@@ -10,12 +10,12 @@ $(() => {
     let posY = event.clientY
     let mouse = new Vector(posX, posY)
 
-    for(let human of humans) {
+    for(let human of simulation.humans) {
       let humanv = human.getWindowLocation()
       let distance = humanv.clone().minus(mouse).getMagnitude()
       if(distance < human.radius) {
         human.infect()
-        if(datarecords[datarecords.length-1].infected == 0) firstInfection = tickCount
+        if(simulation.datarecords[simulation.datarecords.length-1].infected == 0) simulation.startDate = simulation.tickCount
       }
     }
   })
@@ -32,6 +32,8 @@ $(() => {
 
   // listen for zooming
   $('#canvas').on('DOMMouseScroll mousewheel', (event) => {
+
+    let camera = simulation.camera
 
     let mouseMapPos = {x: 0, y: 0}
     mouseMapPos.x = (mouse.pos.x/camera.zoom)+camera.x
@@ -51,10 +53,10 @@ $(() => {
     }
 
     if(camera.zoom < 0.3) {
-      options.clearScreen = false
+      simulation.options.clearScreen = false
       clearScreen()
     } else {
-      options.clearScreen = true
+      simulation.options.clearScreen = true
     }
   })
     
@@ -66,6 +68,7 @@ $(() => {
 
 function moving() {
   let moved = false
+  let camera = simulation.camera
 
   let speed = (1/camera.zoom)*10
 

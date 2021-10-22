@@ -1,0 +1,2 @@
+a.map(s => { return {ve: s.vaccinEffectivity, rem: s.datarecords[s.datarecords.length-1].removed, time: s.datarecords[s.datarecords.length-1].time, vac: s.datarecords[s.datarecords.length-1].vaccinations, avgi: s.datarecords[s.datarecords.length-1].avgImmunity}})
+let jsonToCsv = "https://www.convertcsv.com/json-to-csv.htm"

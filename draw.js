@@ -7,13 +7,14 @@ function frame() {
   // rerun frame
   window.requestAnimationFrame(frame)
 
-  if(!options.drawing) return
+  if(!simulation.options.drawing) return
   
 	// clear screen
-  if(options.clearScreen == true) clearScreen()
+  if(simulation.options.clearScreen == true) clearScreen()
+  else if(frameCount%20 == 0) clearScreen()
   
   // draw humans
-  for(let human of humans) human.draw()
+  for(let human of simulation.humans) human.draw()
 }
 
 function clearScreen() {

@@ -1,8 +1,8 @@
 class Virus {
     constructor() {
         this.contagiousLength = 14 // days
-        this.infectionChance = 10 // percentage
-        this.infectionDistance = 30 // distance
-
+        this.infectionChance = 3 // percentage (20)
+        this.infectionDistance = 40 // distance (30)
+        this.immunityAfterInfection = 80 // percentage
     }
 }

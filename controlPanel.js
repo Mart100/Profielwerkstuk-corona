@@ -14,6 +14,7 @@ $(() => {
 
 function graphListener() {
   $('#controlPanel > div > .content > .graph').on('click', (event) => {
+    if($('#controlPanel > div > .content > .graph').hasClass('expanded')) return
     let elem = $(event.currentTarget)
     elem.addClass('expanded')
     $('#controlPanel').css('overflow-y', 'visible')
@@ -36,11 +37,11 @@ function buttonListener() {
       elem.toggleClass("toggled")
       let toggled = elem.hasClass("toggled")
       
-      if(elem.hasClass("lockdown")) options.lockdown = toggled
-      if(elem.hasClass("pause")) options.paused = toggled
+      if(elem.hasClass("lockdown")) simulation.options.lockdown = toggled
+      if(elem.hasClass("pause"))  simulation.paused = toggled
     }
     else {
-      if(elem.hasClass("restart")) restart()
+      if(elem.hasClass("restart")) start()
     }
   })
 }
@@ -51,17 +52,17 @@ function sliderListener() {
     let pelem = elem.parent()
     let val = Number(elem.val())
     if(pelem.hasClass("mapsize")) {
-      options.size = (val*50)+1000
-      pelem.find('.value').html(options.size)
-      restart()
+      simulation.options.size = (val*50)+1000
+      pelem.find('.value').html( simulation.options.size)
+      start()
     }
     if(pelem.hasClass("popdensity")) {
-      options.density = (val)
-      pelem.find('.value').html(options.density)
-      restart()
+      simulation.options.density = (val)
+      pelem.find('.value').html(simulation.options.density)
+      start()
     }
     if(pelem.hasClass("deathrate")) {
-      options.surviveChance = 100-val
+      simulation.options.surviveChance = 100-val
       pelem.find('.value').html(val)
     }
   })
@@ -72,42 +73,55 @@ function createDatarecord() {
   let susceptible = 0
   let removed = 0
   let infected = 0
+  let vaccinations = 0
   let totalreproductionnumber = 0
+  let totalreproductionnumbersize = 0
   let averagereproductionnumbertotal = 0
+  let totalImmunity = 0
   
-  for(let human of humans) {
+  for(let human of simulation.humans) {
     total++
     if(human.SIRstatus == "s") susceptible++
     if(human.SIRstatus == "i") infected++
     if(human.SIRstatus == "r") removed++
     
     if(human.SIRstatus == "i") {
-      let infectedLength = (tickCount-human.infectedDate)
-      if(human.othersInfected == 0) continue
-      totalreproductionnumber += human.othersInfected * (daysToTicks(virus.contagiousLength)/infectedLength)
+      let infectedLength = (simulation.tickCount-human.infectedDate)
+      if(infectedLength > daysToTicks(simulation.virus.contagiousLength)/2) {
+        totalreproductionnumber += human.othersInfected * (daysToTicks(simulation.virus.contagiousLength)/infectedLength)
+        totalreproductionnumbersize++
+      }
+
     }
 
-    if(human.SIRstatus == "r") {
-      averagereproductionnumbertotal += human.othersInfected
-    }
+    if(human.vaccinated) vaccinations++
+    totalImmunity += human.immunity
+
+    if(human.SIRstatus == "r") averagereproductionnumbertotal += human.othersInfected
+
   }
 
+  console.log('r: ', totalreproductionnumber + " - " + totalreproductionnumbersize + " - " + totalreproductionnumber/totalreproductionnumbersize)
+
   let datarecord = {
-    time: tickCount,
+    time: simulation.tickCount,
     total,
     susceptible,
     infected,
     removed,
-    reproduction: totalreproductionnumber/(humans.filter(h => h.SIRstatus=="i").length),
+    vaccinations,
+    avgImmunity: totalImmunity/total,
+    reproduction: totalreproductionnumber/totalreproductionnumbersize,
     averageReproduction: averagereproductionnumbertotal/removed
   }
 
-  datarecords.push(datarecord)
+  simulation.datarecords.push(datarecord)
 }
 
 let TPS = 0
 function updateInfoTab() {
-  let lastDataRecord = datarecords[datarecords.length-1]
+  let lastDataRecord = simulation.datarecords[simulation.datarecords.length-1]
+  if(lastDataRecord == undefined) return
 
   $('#info > .content > .total > .value').html(lastDataRecord.total)
   $('#info > .content > .susceptible > .value').html(lastDataRecord.susceptible)  
@@ -116,10 +130,10 @@ function updateInfoTab() {
   $('#info > .content > .reproduction > .value').html(Math.round(lastDataRecord.reproduction*100)/100)
   $('#info > .content > .averageReproduction > .value').html(Math.round(lastDataRecord.averageReproduction*100)/100)
 
-  $('#info > .content > .tickcount > .value').html(tickCount)
+  $('#info > .content > .tickcount > .value').html(simulation.tickCount)
   let newtps = tickArray.filter(a => a+1000>Date.now()).length
   TPS = Math.round(((newtps+TPS)/2)*100)/100
   $('#info > .content > .tps > .value').html(TPS)
-  $('#info > .content > .day > .value').html(day)
+  $('#info > .content > .day > .value').html(simulation.day)
   updateGraphs()
 }

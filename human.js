@@ -6,6 +6,7 @@ class Human {
 
     this.radius = 5
     this.immunity = 0
+    this.vaccinated = false
     this.SIRstatus = "s"
     this.nearbyHumans = []
     this.nearbyHumansBig = []
@@ -14,18 +15,17 @@ class Human {
     this.othersInfected = 0
     this.infectedDate = 0
     this.noLongerInfectedDate = 0
-    this.vaccininProtection = 0
   }
   move() {
     if(this.target == null) {
       // walking
       if(Math.random() < 0.99) {
-        if(!options.lockdown) this.findTarget()
+        if(!simulation.options.lockdown) this.findTarget()
         else if(Math.random() > 0.999) this.findTarget()
       } 
       // flight
       else {
-        let pos = new Vector(Math.random()*options.size, Math.random()*options.size)
+        let pos = new Vector(Math.random()*simulation.options.size, Math.random()*simulation.options.size)
         this.pos = pos.clone()
         this.anchor = pos.clone()
         this.getNearbyHumansBig()
@@ -42,25 +42,32 @@ class Human {
   }
   infect() {
     this.SIRstatus = "i"
-    this.infectedDate = tickCount
+    this.infectedDate = simulation.tickCount
+    this.othersInfected = 0
     this.getNearbyHumansBig()
     
   }
+  vaccinate(immunity) {
+    this.vaccinated = true
+    //this.SIRstatus = "r"
+    this.immunity += (100-this.immunity)*(immunity/100)
+  }
   findTarget() {
     if(this.pos.getDistanceTo(this.anchor) < 5) {
-      let randomX = ((Math.random()*options.moveRange*2)-options.moveRange)+this.pos.x
-      let randomY = ((Math.random()*options.moveRange*2)-options.moveRange)+this.pos.y
+      let moveRange = simulation.options.moveRange
+      let randomX = ((Math.random()*moveRange*2)-moveRange)+this.pos.x
+      let randomY = ((Math.random()*moveRange*2)-moveRange)+this.pos.y
       let target = new Vector(randomX, randomY)
       this.target = target
     } else {
       this.target = this.anchor.clone()
     }
 
-    this.targetVel = this.target.clone().minus(this.pos).setMagnitude(options.moveSpeed)
+    this.targetVel = this.target.clone().minus(this.pos).setMagnitude(simulation.options.moveSpeed)
   }
   getNearbyHumans() {
     let radius = 2
-    let a = virus.infectionDistance*radius
+    let a = simulation.virus.infectionDistance*radius
     this.nearbyHumans = []
     for(let p of this.nearbyHumansBig) {
       if(Math.abs(this.pos.x-p.pos.x) > a) continue
@@ -72,9 +79,9 @@ class Human {
   }
   getNearbyHumansBig() {
     let radius = 50
-    let a = virus.infectionDistance*radius
+    let a = simulation.virus.infectionDistance*radius
     this.nearbyHumansBig = []
-    for(let p of humans) {
+    for(let p of simulation.humans) {
       if(Math.abs(this.pos.x-p.pos.x) > a) continue
       if(Math.abs(this.pos.y-p.pos.y) > a) continue
       //let vec = {x: this.pos.x-p.pos.x, y: this.pos.y-p.pos.y}
@@ -84,11 +91,14 @@ class Human {
     return this.nearbyHumansBig
   }
   getWindowLocation() {
+    let camera = simulation.camera
     let x = (this.pos.x - camera.x)*camera.zoom
     let y = (this.pos.y - camera.y)*camera.zoom
     return new Vector(x, y)
   }
   draw() {
+
+    let camera = simulation.camera
     
     let pos = this.getWindowLocation()
 
@@ -98,12 +108,12 @@ class Human {
     if(pos.y < 0) return
 
     if(camera.zoom < 0.3) {
-      if(Math.random() > camera.zoom*1.5) return 
+      if(Math.random() > camera.zoom*2) return 
     }
 
     let color = [0, 0, 0]
     if(this.SIRstatus == "s") color = [0, 255, 0]
-    if(this.SIRstatus == "i") color = [0, 0, 255]
+    if(this.SIRstatus == "i") color = [255, 0, 0]
     if(this.SIRstatus == "r") color = [0, 0, 0]
 
     ctx.beginPath()
@@ -112,5 +122,10 @@ class Human {
     if(camera.zoom < 0.5) size = this.radius*0.5
     ctx.arc(pos.x, pos.y, size, 0, 2*Math.PI)
     ctx.fill()
+
+    if(this.vaccinated) {
+      ctx.strokeStyle = "rgb(100, 100, 100)"
+      ctx.stroke()
+    }
   }
 }
