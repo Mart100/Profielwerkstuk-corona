@@ -10,7 +10,7 @@ app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({extended:true, limit: '50mb'}));
 
 
-app.use(express.static('../'))
+app.use(express.static('public'))
 
 
 app.post('/log', (req, res) => {
@@ -46,5 +46,5 @@ app.post('/log', (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log(`Profielwerkstuk automated logging at http://localhost:${port}`)
+  console.log(`Profielwerkstuk automated logging on ${port}`)
 })
