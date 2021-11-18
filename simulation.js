@@ -39,8 +39,8 @@ class Simulation {
 
 
 	startInfection() {
-		this.humans[0].infect()
-		this.startDate = this.tickCount
+		for(let i=0;i<10; i++) this.humans[i].infect()
+		this.startDate = this.tickCount	
 	}
 
 	spawnRandomHumans(amount) {
@@ -88,18 +88,22 @@ class Simulation {
 		let searchParams = new URLSearchParams(window.location.search)
 		if(searchParams.has("automated")) {
 
+			if(!searchParams.has("t")) searchParams.set("t", "1")
+
 			$.ajax({
 				url: "log",
 				type: 'POST',
 				contentType: 'application/json',
 				data: JSON.stringify({
 					datarecords: this.datarecords,
-					vaccinEffectivity: this.options.vaccinEffectivity
+					vaccinEffectivity: this.options.vaccinEffectivity,
+					times: searchParams.get("t")
 				}),
 				success: function(response) {
 					if(typeof response === 'string') response = JSON.parse(response)
 					console.log('log response:', response)
 					searchParams.set("ve", response.ve)
+					searchParams.set("t", response.t)
 					window.location.href = "?"+searchParams.toString()
 				}
 			})
