@@ -90,22 +90,30 @@ class Human {
     }
     return this.nearbyHumansBig
   }
-  getWindowLocation() {
+  getWindowLocation(pos) {
     let camera = simulation.camera
-    let x = (this.pos.x - camera.x)*camera.zoom
-    let y = (this.pos.y - camera.y)*camera.zoom
+    let x = (pos.x - camera.x)*camera.zoom
+    let y = (pos.y - camera.y)*camera.zoom
     return new Vector(x, y)
   }
   draw() {
 
     let camera = simulation.camera
+
+    let xPos = this.pos.x%simulation.options.size
+    let yPos = this.pos.y%simulation.options.size
+
+    if(xPos < 0) xPos += simulation.options.size
+    if(yPos < 0) yPos += simulation.options.size
     
-    let pos = this.getWindowLocation()
+    let pos = this.getWindowLocation(new Vector(xPos, yPos))
 
     if(pos.x > canvas.width) return
     if(pos.x < 0) return
     if(pos.y > canvas.height) return
     if(pos.y < 0) return
+
+    
 
     if(camera.zoom < 0.3) {
       if(Math.random() > camera.zoom*2) return 
@@ -116,14 +124,13 @@ class Human {
     if(this.SIRstatus == "i") color = [255, 0, 0]
     if(this.SIRstatus == "r") color = [0, 0, 0]
 
-    ctx.beginPath()
     ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`
     let size = this.radius*camera.zoom
     if(camera.zoom < 0.5) size = this.radius*0.5
+    ctx.moveTo(pos.x, pos.y)
     ctx.arc(pos.x, pos.y, size, 0, 2*Math.PI)
-    ctx.fill()
 
-    if(this.vaccinated) {
+    if(this.vaccinated && false) {
       ctx.strokeStyle = "rgb(100, 100, 100)"
       ctx.stroke()
     }

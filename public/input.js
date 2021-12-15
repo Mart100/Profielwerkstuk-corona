@@ -11,7 +11,7 @@ $(() => {
     let mouse = new Vector(posX, posY)
 
     for(let human of simulation.humans) {
-      let humanv = human.getWindowLocation()
+      let humanv = human.getWindowLocation(human.pos)
       let distance = humanv.clone().minus(mouse).getMagnitude()
       if(distance < human.radius) {
         human.infect()

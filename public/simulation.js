@@ -4,6 +4,7 @@ class Simulation {
 
 		this.humans = []
 		this.virus = new Virus()
+		this.grid = new Grid(10)
 		this.seed = Math.random()
 		this.day = 0
 		this.startDate = 0
@@ -27,7 +28,7 @@ class Simulation {
 			lockdown: false,
 			drawing: true,
 			dayLength: 20,
-			vaccinEffectivity: 90
+			vaccinEffectivity: 90,
 		}
 
 		let searchParams = new URLSearchParams(window.location.search)

@@ -12,9 +12,16 @@ function frame() {
 	// clear screen
   if(simulation.options.clearScreen == true) clearScreen()
   else if(frameCount%20 == 0) clearScreen()
+
+  simulation.grid.draw()
   
   // draw humans
+  ctx.beginPath()
   for(let human of simulation.humans) human.draw()
+  ctx.fill()
+  ctx.closePath()
+
+  
 }
 
 function clearScreen() {
