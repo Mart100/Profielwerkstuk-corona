@@ -66,42 +66,46 @@ $(() => {
     }
   })
 
-  $('#canvas').on('touchstart', (e) => {
-    if(e.touches.length == 2) {
-      touch.isDragging = false
-      handlePinch(e)
-    }
-    else if(e.touches.length == 1) {
-      touch.isDragging = true
-      touch.dragStart.x = getEventLocation(e).x/simulation.camera.zoom - simulation.camera.x
-      touch.dragStart.y = getEventLocation(e).y/simulation.camera.zoom - simulation.camera.y
-    }
-  })
-
-  $('#canvas').on('touchend', (e) => {
-    if(e.touches.length == 2) {
-      touch.isDragging = false
-      handlePinch(e)
-    }
-    else if(e.touches.length == 1) {
-      touch.isDragging = false
-      touch.initialPinchDistance = null
-      touch.lastZoom = simulation.camera.zoom
-    }
-  })
-
-  $('#canvas').on('touchmove', (e) => {
-    if(e.touches.length == 2) {
-      touch.isDragging = false
-      handlePinch(e)
-    }
-    else if(e.touches.length == 1) {
-      if (touch.isDragging) {
-        simulation.camera.x = touch.dragStart.x - getEventLocation(e).x/simulation.camera.zoom
-        simulation.camera.y = touch.dragStart.y - getEventLocation(e).y/simulation.camera.zoom
+  if(onMobile) {
+    $('#canvas').on('touchstart', (e) => {
+      if(e.touches.length == 2) {
+        touch.isDragging = false
+        handlePinch(e)
       }
-    }
-  })
+      else if(e.touches.length == 1) {
+        touch.isDragging = true
+        touch.dragStart.x = getEventLocation(e).x/simulation.camera.zoom - simulation.camera.x
+        touch.dragStart.y = getEventLocation(e).y/simulation.camera.zoom - simulation.camera.y
+      }
+    })
+  
+    $('#canvas').on('touchend', (e) => {
+      if(e.touches.length == 2) {
+        touch.isDragging = false
+        handlePinch(e)
+      }
+      else if(e.touches.length == 1) {
+        touch.isDragging = false
+        touch.initialPinchDistance = null
+        touch.lastZoom = simulation.camera.zoom
+      }
+    })
+  
+    $('#canvas').on('touchmove', (e) => {
+      if(e.touches.length == 2) {
+        touch.isDragging = false
+        handlePinch(e)
+      }
+      else if(e.touches.length == 1) {
+        if (touch.isDragging) {
+          simulation.camera.x = touch.dragStart.x - getEventLocation(e).x/simulation.camera.zoom
+          simulation.camera.y = touch.dragStart.y - getEventLocation(e).y/simulation.camera.zoom
+        }
+      }
+    })
+  }
+
+
 
   function getEventLocation(e) {
     if (e.touches && e.touches.length == 1) return { x:e.touches[0].clientX, y: e.touches[0].clientY }
