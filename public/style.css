@@ -125,6 +125,7 @@ body {
   #canvas {
     position: relative;
     height: 60%;
+    touch-action: none;
   }
   #controlPanel .content {
     width: 50%;

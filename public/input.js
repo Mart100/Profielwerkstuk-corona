@@ -67,6 +67,8 @@ $(() => {
   })
 
   if(onMobile) {
+    touch.lastZoom = simulation.camera.zoom
+
     $('#canvas').on('touchstart', (e) => {
       if(e.touches.length == 2) {
         touch.isDragging = false
@@ -74,9 +76,10 @@ $(() => {
       }
       else if(e.touches.length == 1) {
         touch.isDragging = true
-        touch.dragStart.x = getEventLocation(e).x/simulation.camera.zoom - simulation.camera.x
-        touch.dragStart.y = getEventLocation(e).y/simulation.camera.zoom - simulation.camera.y
+        touch.dragStart.x = -getEventLocation(e).x/simulation.camera.zoom - simulation.camera.x
+        touch.dragStart.y = -getEventLocation(e).y/simulation.camera.zoom - simulation.camera.y
       }
+      
     })
   
     $('#canvas').on('touchend', (e) => {
@@ -98,8 +101,11 @@ $(() => {
       }
       else if(e.touches.length == 1) {
         if (touch.isDragging) {
-          simulation.camera.x = touch.dragStart.x - getEventLocation(e).x/simulation.camera.zoom
-          simulation.camera.y = touch.dragStart.y - getEventLocation(e).y/simulation.camera.zoom
+          simulation.camera.x = -getEventLocation(e).x/simulation.camera.zoom - touch.dragStart.x
+          simulation.camera.y = -getEventLocation(e).y/simulation.camera.zoom - touch.dragStart.y
+
+          simulation.camera.x = Math.max(Math.min(simulation.camera.x, simulation.options.size/(simulation.camera.zoom*5)), -simulation.options.size/(simulation.camera.zoom*5))
+          simulation.camera.y = Math.max(Math.min(simulation.camera.y, simulation.options.size/(simulation.camera.zoom*5)), -simulation.options.size/(simulation.camera.zoom*5))
         }
       }
     })
@@ -108,36 +114,48 @@ $(() => {
 
 
   function getEventLocation(e) {
-    if (e.touches && e.touches.length == 1) return { x:e.touches[0].clientX, y: e.touches[0].clientY }
-    else if (e.clientX && e.clientY) return { x: e.clientX, y: e.clientY }    
-
-}
+    if (e.touches && e.touches.length == 1) return { x: e.touches[0].clientX/2, y: e.touches[0].clientY/2 }
+    else if (e.clientX && e.clientY) return { x: e.clientX/2, y: e.clientY/2 }    
+  }
 
   function handlePinch(e) {
       e.preventDefault()
+      console.log()
       
       let touch1 = { x: e.touches[0].clientX, y: e.touches[0].clientY }
       let touch2 = { x: e.touches[1].clientX, y: e.touches[1].clientY }
+      let zoomMiddle = {
+        x: (e.touches[0].clientX+e.touches[1].clientX)/2,
+        y: (e.touches[0].clientY+e.touches[1].clientY)/2
+      }
       
       // This is distance squared, but no need for an expensive sqrt as it's only used in ratio
       let currentDistance = (touch1.x - touch2.x)**2 + (touch1.y - touch2.y)**2
       
-      if (initialPinchDistance == null) touch.initialPinchDistance = currentDistance
-      else adjustZoom( null, currentDistance/touch.initialPinchDistance )
+      if (touch.initialPinchDistance == null) touch.initialPinchDistance = currentDistance
+      else {
+        adjustZoom(null, currentDistance/touch.initialPinchDistance, zoomMiddle)
+      }
   }
 
-  function adjustZoom(zoomAmount, zoomFactor) {
-    if (!isDragging) {
-      if (zoomAmount) cameraZoom += zoomAmount
-      else if (zoomFactor) {
-        console.log(zoomFactor)
-        camera.zoom = zoomFactor*lastZoom
+  function adjustZoom(zoomAmount, zoomFactor, zoomMiddle) {
+    let cam = simulation.camera
+    if (!touch.isDragging) {
+      if (zoomAmount) cam.zoom += zoomAmount
+      else if (zoomFactor) cam.zoom = zoomFactor*touch.lastZoom
+
+      if(zoomFactor < 1) {
+        cam.x -= cam.zoom*100/zoomFactor
+        cam.y -= cam.zoom*100/zoomFactor
+      } else {
+        cam.x += cam.zoom*100/zoomFactor
+        cam.y += cam.zoom*100/zoomFactor
       }
       
-      camera.zoom = Math.min( cameraZoom, 20 )
-      camera.zoom = Math.max( cameraZoom, 0.01 )
-      
-      console.log(zoomAmount)
+      cam.zoom = Math.min(cam.zoom, 20)
+      cam.zoom = Math.max(cam.zoom, 0.01)
+
+      console.log(cam.zoom*100/zoomFactor)
     }
 }
     
