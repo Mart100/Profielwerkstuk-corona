@@ -3,6 +3,7 @@ class Simulation {
 	constructor() {
 
 		this.humans = []
+		this.humanCategories = {s: [], i: [], r: []}
 		this.virus = new Virus()
 		this.grid = new Grid(10)
 		this.seed = Math.random()
@@ -61,6 +62,7 @@ class Simulation {
 			}
 	
 			this.humans.push(human)
+			this.humanCategories.s.push(human)
 			
 		}
 	}

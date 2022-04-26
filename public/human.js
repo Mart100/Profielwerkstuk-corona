@@ -41,11 +41,17 @@ class Human {
     this.pos.y += this.targetVel.y
   }
   infect() {
-    this.SIRstatus = "i"
+    this.updateSIRstatus('i')
     this.infectedDate = simulation.tickCount
     this.othersInfected = 0
     this.getNearbyHumansBig()
-    
+  }
+  updateSIRstatus(newStatus) {
+    let idx = simulation.humanCategories[this.SIRstatus].indexOf(this)
+    if(idx > -1) simulation.humanCategories[this.SIRstatus].splice(idx, 1)
+
+    this.SIRstatus = newStatus
+    simulation.humanCategories[newStatus].push(this)
   }
   vaccinate(immunity) {
     this.vaccinated = true
@@ -108,31 +114,9 @@ class Human {
     
     let pos = this.getWindowLocation(new Vector(xPos, yPos))
 
-    if(pos.x > canvas.width) return
-    if(pos.x < 0) return
-    if(pos.y > canvas.height) return
-    if(pos.y < 0) return
-
-    
-
-    if(camera.zoom < 0.3) {
-      if(Math.random() > camera.zoom*2) return 
-    }
-
-    let color = [0, 0, 0]
-    if(this.SIRstatus == "s") color = [0, 255, 0]
-    if(this.SIRstatus == "i") color = [255, 0, 0]
-    if(this.SIRstatus == "r") color = [0, 0, 0]
-
-    ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`
     let size = this.radius*camera.zoom
-    if(camera.zoom < 0.5) size = this.radius*0.5
+    if(camera.zoom < 0.1) size = this.radius*0.1
     ctx.moveTo(pos.x, pos.y)
     ctx.arc(pos.x, pos.y, size, 0, 2*Math.PI)
-
-    if(this.vaccinated && false) {
-      ctx.strokeStyle = "rgb(100, 100, 100)"
-      ctx.stroke()
-    }
   }
 }

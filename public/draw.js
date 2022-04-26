@@ -1,27 +1,44 @@
 let frameCount = 0
+let fpsController = {
+  fpsInterval: 50,
+  previousTick: Date.now()
+}
 
 function frame() {
-
-  frameCount++
 
   // rerun frame
   window.requestAnimationFrame(frame)
 
   if(!simulation.options.drawing) return
-  
-	// clear screen
-  if(simulation.options.clearScreen == true) clearScreen()
-  else if(frameCount%20 == 0) clearScreen()
 
-  simulation.grid.draw()
+  let elapsed = Date.now() - fpsController.previousTick
+  if(elapsed < fpsController.fpsInterval) return
+  fpsController.previousTick = Date.now() - (elapsed%fpsController.fpsInterval)
+
+  frameCount++
+
+  clearScreen()
+
+  //simulation.grid.draw()
   
   // draw humans
   ctx.beginPath()
-  for(let human of simulation.humans) human.draw()
+  ctx.fillStyle = `rgb(0,255,0)`
+  for(let human of simulation.humanCategories.s) human.draw()
   ctx.fill()
   ctx.closePath()
 
+  ctx.fillStyle = `rgb(255,0,0)`
+  ctx.beginPath()
+  for(let human of simulation.humanCategories.i) human.draw()
+  ctx.fill()
+  ctx.closePath()
   
+  ctx.fillStyle = `rgb(0,0,0)`
+  ctx.beginPath()  
+  for(let human of simulation.humanCategories.r) human.draw()
+  ctx.fill()
+  ctx.closePath()
 }
 
 function clearScreen() {

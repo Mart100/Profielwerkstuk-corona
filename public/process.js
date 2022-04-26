@@ -40,15 +40,15 @@ function tick() {
   } 
 
   if(tickCount % 10 == 0) {
-    console.time('nearbyHumans')
+    //console.time('nearbyHumans')
     let i = 0
     for(let human of humans) {
       if(human.SIRstatus != "i") continue
       i++
       human.getNearbyHumans()
     }
-    console.timeEnd('nearbyHumans')
-    console.log('calculated count: ', i)
+    //console.timeEnd('nearbyHumans')
+    //console.log('calculated count: ', i)
   }
   for(let human of humans) {
     human.move()
@@ -56,12 +56,12 @@ function tick() {
     if(human.immunity < 0) human.immunity = 0
   }
 
-  for(let human of humans.filter(human => human.SIRstatus == "i")) {
+  for(let human of simulation.humanCategories.i) {
 
     if(tickCount-human.infectedDate > daysToTicks(virus.contagiousLength)) {
 
       human.noLongerInfectedDate = tickCount
-      human.SIRstatus = "r"
+      human.updateSIRstatus('r')
       human.immunity += (100-human.immunity)*(virus.immunityAfterInfection/100)
     }
 

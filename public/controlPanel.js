@@ -41,7 +41,7 @@ function buttonListener() {
       if(elem.hasClass("pause"))  simulation.paused = toggled
     }
     else {
-      if(elem.hasClass("restart")) start()
+      if(elem.hasClass("restart")) simulation.start()
     }
   })
 }
@@ -101,7 +101,7 @@ function createDatarecord() {
 
   }
 
-  console.log('r: ', totalreproductionnumber + " - " + totalreproductionnumbersize + " - " + totalreproductionnumber/totalreproductionnumbersize)
+  //console.log('r: ', totalreproductionnumber + " - " + totalreproductionnumbersize + " - " + totalreproductionnumber/totalreproductionnumbersize)
 
   let datarecord = {
     time: simulation.tickCount,
@@ -131,6 +131,7 @@ function updateInfoTab() {
   $('#info > .content > .averageReproduction > .value').html(Math.round(lastDataRecord.averageReproduction*100)/100)
 
   $('#info > .content > .tickcount > .value').html(simulation.tickCount)
+  $('#info > .content > .framecount > .value').html(frameCount)
   let newtps = tickArray.filter(a => a+1000>Date.now()).length
   TPS = Math.round(((newtps+TPS)/2)*100)/100
   $('#info > .content > .tps > .value').html(TPS)

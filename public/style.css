@@ -116,3 +116,18 @@ body {
   height: 600px;
   transition-duration: 0.5s;
 }
+
+@media only screen and (max-width: 1000px) {
+  #controlPanel {
+    position: relative;
+    width: 100%;
+  }
+  #canvas {
+    position: relative;
+    height: 60%;
+  }
+  #controlPanel .content {
+    width: 50%;
+    margin: auto;
+  }
+}
